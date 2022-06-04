@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SalaryManagementSystem</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script>
+        $(function () {
+            $.get("getUser",{},function (user) {
+                var username = user.username;
+                var welcome = "欢迎访问，"+username;
+                $('#user_welcome').html(welcome);
+            })
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">欢迎使用工资管理系统</h1><br><br>
+    <h3 align="right" id="user_welcome"></h3><br>
+    <a align="center" th:href="@{/employee}"><h2>员工信息</h2></a><br>
+    <a align="center" th:href="@{/salary}"><h2>员工工资情况</h2></a><br>
+    <a align="center" th:href="@{/department}"><h2>部门信息</h2></a><br>
+    <a align="center" th:href="@{/position}"><h2>职位信息</h2></a><br>
+    <a align="center" th:href="@{/scale}"><h2>工资等级</h2></a><br>
+    <a align="center" th:href="@{/exit}"><h2>退出登录</h2></a>
+</body>
+</html>

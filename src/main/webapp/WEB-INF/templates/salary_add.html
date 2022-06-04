@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>salary_add</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script>
+        function checkId() {
+            var id = $('#id').val();
+            var reg_id = /^[0-9]{1,5}$/;
+            var flag = reg_id.test(id);
+            if (!flag){
+                $('#id').css("border","1px solid red");
+                return false;
+            }else{
+                $('#id').css("border","");
+                return true;
+            }
+        }
+        function checkAllowance() {
+            var allowance = $('#allowance').val();
+            var reg_allowance = /^[0-9]{1,9}$/;
+            var flag = reg_allowance.test(allowance);
+            if (!flag){
+                $('#allowance').css("border","1px solid red");
+                return false;
+            }else{
+                $('#allowance').css("border","");
+                return true;
+            }
+        }
+        function checkDeduction() {
+            var deduction = $('#deduction').val();
+            var reg_deduction = /^[0-9]{1,9}$/;
+            var flag = reg_deduction.test(deduction);
+            if (!flag){
+                $('#deduction').css("border","1px solid red");
+                return false;
+            }else{
+                $('#deduction').css("border","");
+                return true;
+            }
+        }
+        $(function () {
+            $('#id').blur(function () {
+                var eid = $('#id').val();
+                if (checkId()){
+                    $.ajaxSettings.async = false;//变为同步请求
+                    $.get("getBaseSalary",{eid:eid},function (baseSalary) {
+                       $('#baseSalary').val(baseSalary);
+                       $('#baseSalary').attr("readonly","readonly");
+                    })
+                    $.ajaxSettings.async = true;
+                } else{
+                    alert("请输入添加员工的id！");
+                }
+            })
+            $('#deduction').blur(function () {
+                var baseSalary = parseFloat($('#baseSalary').val());
+                var allowance = parseFloat($('#allowance').val());
+                var deduction = parseFloat($('#deduction').val());
+                if (checkAllowance() && checkDeduction()){
+                    var realSalary = baseSalary+allowance-deduction;
+                    $('#realSalaryShow').html(realSalary);
+                    $('#realSalary').val(realSalary);
+                }
+            })
+            $('#add_btn').click(function () {
+                $.post("addSalary",$('#salary_form').serialize(),function (flag) {
+                    if (flag){
+                        alert("添加成功");
+                        location.href = "/SalaryManagementSystem/salary";
+                    } else {
+                        alert("添加失败，请重试")
+                    }
+                })
+            })
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/salary";
+            })
+            $('#allowance').blur(checkAllowance);
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">添加工资信息</h1><br>
+    <div th:align="center" id="form">
+        <form id="salary_form" method="post">
+            <h2 align="center">员工编号：<input id="id" name="id" type="text"></h2>
+            <h2 align="center">工资发放时间：<input id="salaryTime" name="salaryTime" type="month"></h2>
+            <h2 align="center">基础工资：<input id="baseSalary" name="baseSalary" type="text"></h2>
+            <h2 align="center">奖金：<input id="allowance" name="allowance" type="text"></h2>
+            <h2 align="center">扣费：<input id="deduction" name="deduction" type="text"></h2>
+            <h2 align="center"><input id="realSalary" name="realSalary" type="hidden"></h2>
+            <div><h2>实发工资:<div id="realSalaryShow"></div></h2></div>
+            <div th:align="center">
+                <button id="add_btn" type="button"><h2>添加</h2></button>
+                <button id="back_btn" type="button"><h2>返回</h2></button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

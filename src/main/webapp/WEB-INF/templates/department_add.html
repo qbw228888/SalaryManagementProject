@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>department_add</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script>
+        $(function () {
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/department";
+            })
+            $('#add_btn').click(function () {
+                if (checkName() && checkId() && checkCount()) {
+                    $.post("addDepartment", $('#department_form').serialize(),function (flag) {
+                        if (flag){
+                            alert("添加成功");
+                            location.href = "/SalaryManagementSystem/department";
+                        } else{
+                            alert("添加失败，请重试！");
+                        }
+                    })
+                }
+            })
+            $('#id').blur(checkId);
+            $('#name').blur(checkName);
+            $('#count').blur(checkCount);
+        })
+        function checkId() {
+            if ($('#id').val() == null){
+                $('#id').css("border","1px solid red");
+                return false;
+            }else{
+                $('#id').css("border","");
+                return true;
+            }
+        }
+        function checkName() {
+            if ($('#name').val() == null){
+                $('#name').css("border","1px solid red");
+                return false;
+            }else{
+                $('#name').css("border","");
+                return true;
+            }
+        }
+        function checkCount() {
+            if ($('#count').val() == null){
+                $('#count').css("border","1px solid red");
+                return false;
+            }else{
+                $('#count').css("border","");
+                return true;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1 align="center">添加部门</h1><br>
+    <h3 th:align="center" id="error_message"></h3>
+    <form id="department_form" method="post">
+        <h2 align="center">部门编号：<input id="id" name="id" type="text"></h2>
+        <h2 align="center">部门名称：<input id="name" name="name" type="text"></h2>
+        <h2 align="center">部门人数：<input id="count" name="count" type="text"></h2>
+        <div th:align="center">
+            <button id="add_btn" type="button"><h2>添加</h2></button>
+            <button id="back_btn" type="button"><h2>返回</h2></button>
+        </div>
+    </form>
+</body>
+</html>

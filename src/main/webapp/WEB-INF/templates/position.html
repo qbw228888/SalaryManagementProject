@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>position</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        function load() {
+            $.ajaxSettings.async = false;
+            $.get("showPositions",{},function (positions) {
+                var position_list = '<tr>\n' +
+                    '            <th>职位编号</th>\n' +
+                    '            <th>职位名称</th>\n' +
+                    '            <th>职位描述</th>\n' +
+                    '            <th>option-update</th>\n' +
+                    '            <th>option-delete</th>\n' +
+                    '        </tr>';
+                for (var i = 0; i < positions.length; i++){
+                    position_list += '<tr>\n' +
+                        '            <td>'+positions[i].id+'</td>\n' +
+                        '            <td>'+positions[i].name+'</td>\n' +
+                        '            <td>'+positions[i].description+'</td>\n' +
+                        '            <td>\n' +
+                        '                <a href="position/update?id='+positions[i].id+'">更改</a>\n' +
+                        '            </td>\n' +
+                        '            <td>\n' +
+                        '                <a class="delete" deleteId="'+positions[i].id+'">删除</a>\n' +
+                        '            </td>\n' +
+                        '        </tr>';
+                }
+                $('#position_table').html(position_list);
+            })
+            $.ajaxSettings.async = true;
+        }
+        $(function () {
+            load();
+
+            $('#position_add_btn').click(function () {
+                location.href = "/SalaryManagementSystem/position/add";
+            })
+
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/welcome";
+            })
+
+            $('.delete').click(function () {
+                var id = $(this).attr("deleteId");
+                $.confirm({
+                    title: '确认',
+                    content: '确认删除该条数据?注意！该职位的员工的职位信息也将被修改为null！',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                $.post("position/delete",{id:id},function (flag) {
+                                    if (flag){
+                                        alert("删除成功");
+                                        load();
+                                    } else{
+                                        alert("删除失败，请重试");
+                                    }
+                                })
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            })
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">职位信息页</h1><br>
+    <div th:align="center">
+        <button id="position_add_btn" type="button"><h3>添加职位信息</h3></button>
+    </div>
+    <br>
+    <table border="1" cellpadding="0" cellspacing="0" th:align="center" id="position_table">
+        <tr>
+            <th>职位编号</th>
+            <th>职位名称</th>
+            <th>职位描述</th>
+            <th>option-update</th>
+            <th>option-delete</th>
+        </tr>
+    </table>
+    <br>
+    <div th:align="center">
+        <button id="back_btn" type="button"><h3>返回首页</h3></button>
+    </div>
+</body>
+</html>

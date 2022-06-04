@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>scale_update</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        function checkSalary() {
+            var salary = $('#salary').val();
+            var reg_salary = 	/^[0-9]{1,10}$/;;
+            var flag = reg_salary.test(salary);
+            if (!flag){
+                $('#salary').css("border","1px solid red");
+                return false;
+            }else{
+                $('#salary').css("border","");
+                return true;
+            }
+        }
+        function checkDescription() {
+            var description = $('#description').val();
+            var reg_description = 	/^[\u2E80-\u9FFF]+$/;
+            var flag = reg_description.test(description);
+            if (!flag){
+                $('#description').css("border","1px solid red");
+                return false;
+            }else{
+                $('#description').css("border","");
+                return true;
+            }
+        }
+        $(function () {
+            var urlStr = window.location.search;
+            var id = urlStr.split("=",2)[1];
+            $.ajaxSettings.async = false;//变为同步请求
+            $.get("/SalaryManagementSystem/getScale",{id:id},function (scale) {
+                var scale_form =
+                    '        <h2 align="center">等级编号：<input id="newId" name="newId" type="text" readonly="readonly" value="'+scale.id+'"></h2>\n' +
+                    '        <h2 align="center">基本工资：<input id="salary" name="salary" type="text" value="'+scale.salary+'"></h2>\n' +
+                    '        <h2 align="center">等级描述：<input id="description" name="description" type="text" value="'+scale.description+'"></h2>\n' +
+                    '        <div align="center">\n' +
+                    '            <button id="update_btn" type="button"><h2>更改</h2></button>\n' +
+                    '            <button id="back_btn" type="button"><h2>返回</h2></button>\n'   +
+                    '        </div>\n';
+                $('#scale_form').html(scale_form);
+            })
+            $.ajaxSettings.async = true;
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/scale";
+            })
+            $('#update_btn').click(function () {
+                $.confirm({
+                    title: '确认',
+                    content: '确认修改该条数据?注意！员工工资记录表可能也将被修改！',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                if (checkSalary() && checkDescription()) {
+                                    $.post("updateScale", $('#scale_form').serialize(), function (flag) {
+                                        if (flag) {
+                                            alert("修改成功");
+                                            location.href = "/SalaryManagementSystem/scale";
+                                        } else {
+                                            alert("修改失败，请重试");
+                                        }
+                                    })
+                                }
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            })
+            $('#newId').blur(checkId);
+            $('#salary').blur(checkSalary);
+            $('#description').blur(checkDescription);
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">修改工资等级信息</h1><br>
+    <form id="scale_form" method="post">
+    </form>
+</body>
+</html>

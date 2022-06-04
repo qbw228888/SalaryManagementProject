@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SalaryManagementSystem-salary</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        function load(eid,name,salaryTime,scale) {
+            $.ajaxSettings.async = false;//变为同步请求，以便能找到delete和update按钮
+            $.get("showSalaries",{eid:eid,name:name,salaryTime:salaryTime,scale:scale},function (salaries) {
+                let sum = 0;
+                let count = 0;
+                var salary_list =
+                    '        <tr>\n' +
+                    '            <th>员工编号</th>\n' +
+                    '            <th>姓名</th>\n' +
+                    '            <th>工资发放时间</th>\n' +
+                    '            <th>薪资等级</th>\n' +
+                    '            <th>基础工资</th>\n' +
+                    '            <th>津贴</th>\n' +
+                    '            <th>扣费</th>\n' +
+                    '            <th>实发工资</th>\n' +
+                    '            <th>option-update</th>\n' +
+                    '            <th>option-delete</th>\n' +
+                    '        </tr>';
+                for (var i = 0; i < salaries.length; i++){
+                    salary_list += '<tr>\n' +
+                        '            <td>'+salaries[i].eid+'</td>\n' +
+                        '            <td>'+salaries[i].name+'</td>\n' +
+                        '            <td>'+salaries[i].salaryTime+'</td>\n' +
+                        '            <td>'+salaries[i].scale+'</td>\n' +
+                        '            <td>'+salaries[i].baseSalary+'</td>\n' +
+                        '            <td>'+salaries[i].allowance+'</td>\n' +
+                        '            <td>'+salaries[i].deduction+'</td>\n' +
+                        '            <td>'+salaries[i].realSalary+'</td>\n' +
+                        '            <td>\n' +
+                        '                <a href="salary/update?eid='+salaries[i].eid+'&salaryTime='+salaries[i].salaryTime+'">更改</a>\n' +
+                        '            </td>\n' +
+                        '            <td>\n' +
+                        '                <a class="delete" deleteId="'+salaries[i].eid+'" deleteSalaryTime="'+salaries[i].salaryTime+'">删除</a>\n' +
+                        '            </td>\n' +
+                        '        </tr>';
+                    sum += salaries[i].realSalary;
+                    count ++;
+                }
+                let averageSalary = (sum/count).toFixed(2);
+                $('#salary_table').html(salary_list);
+                $('#average_salary').html("平均工资为："+averageSalary);
+            })
+            $.ajaxSettings.async = true;
+        }
+        $(function () {
+            load(0,null,null,0);
+            //搜索
+            $('#salary_search_btn').click(function () {
+                var search_val = $('#salary_search_box').val();
+                var search_type = $('#salary_search_type').val();
+                if (search_type == 'eid'){
+                    load(search_val,null,null,0);
+                } else if (search_type == 'name'){
+                    load(0,search_val,null,0);
+                } else if (search_type == 'salaryTime'){
+                    load(0,null,search_val,0);
+                } else if (search_type == 'scale'){
+                    load(0,null,null,search_val);
+                }
+            })
+
+            //删除
+            $('.delete').click(function () {
+                var eid = $(this).attr("deleteId");
+                var salaryTime = $(this).attr("deleteSalaryTime");
+                $.confirm({
+                    title: '确认',
+                    content: '确认删除该条数据?',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                $.post("salary/delete",{eid:eid,salaryTime:salaryTime},function (flag) {
+                                    if (flag){
+                                        alert("删除成功");
+                                        load(0,null,null,0);
+                                    } else{
+                                        alert("删除失败，请重试");
+                                    }
+                                })
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            });
+
+            //返回首页
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/welcome";
+            })
+            //跳转到添加页面
+            $('#salary_add_btn').click(function () {
+                location.href = "/SalaryManagementSystem/salary/add"
+            })
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">员工工资信息页</h1><br><br>
+    <div th:align="center">
+        <h3>搜索：<input id="salary_search_box" name="employee_search_box" type="text"></h3>
+        <select id="salary_search_type">
+            <option value ="eid">员工编号</option>
+            <option value ="name">员工姓名</option>
+            <option value="salaryTime">发放时间</option>
+            <option value="scale">薪资等级</option>
+        </select>
+    </div>
+    <br>
+    <div th:align="center">
+        <button id="salary_search_btn" type="button"><h3>查询</h3></button>
+    </div>
+    <br>
+    <div>
+        <h3 align="left" id="average_salary"></h3>
+    </div>
+    <br>
+    <div th:align="center">
+        <button id="salary_add_btn" type="button"><h3>添加员工</h3></button>
+    </div>
+    <br>
+    <table border="1" cellpadding="0" cellspacing="0" th:align="center" id="salary_table">
+        <tr>
+            <th>员工编号</th>
+            <th>姓名</th>
+            <th>性别</th>
+            <th>入职时间</th>
+            <th>出生日期</th>
+            <th>年龄</th>
+            <th>email</th>
+            <th>电话</th>
+            <th>所属部门</th>
+            <th>职位</th>
+            <th>薪资等级</th>
+            <th>option1</th>
+            <th>option2</th>
+        </tr>
+    </table>
+    <br>
+    <div th:align="center">
+        <button id="back_btn" type="button"><h3>返回首页</h3></button>
+    </div>
+</body>
+</html>

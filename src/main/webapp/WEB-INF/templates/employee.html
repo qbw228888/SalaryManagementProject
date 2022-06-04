@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SalaryManagementSystem-employee</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        $(function () {
+            load(0,null,null,null,0);
+            //搜索
+            $('#employee_search_btn').click(function () {
+                var search_val = $('#employee_search_box').val();
+                var search_type = $('#employee_search_type').val();
+                if (search_type == 'id'){
+                    load(search_val,null,null,null,0);
+                } else if (search_type == 'name'){
+                    load(0,search_val,null,null,0);
+                } else if (search_type == 'department'){
+                    load(0,null,search_val,null,0);
+                } else if (search_type == 'position'){
+                    load(0,null,null,search_val,0);
+                } else if (search_type == 'scale'){
+                    load(0,null,null,null,search_val);
+                }
+            })
+            //添加
+            $('#employee_add_btn').click(function () {
+                location.href="/SalaryManagementSystem/employee/add";
+            })
+            //删除
+            $('.delete').click(function () {
+                var id = $(this).attr("deleteId");
+                $.confirm({
+                    title: '确认',
+                    content: '确认删除该条数据?',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                               $.post("employee/delete",{id:id},function (flag) {
+                                    if (flag){
+                                        alert("删除成功");
+                                        load(0,null,null,null,0);
+                                    } else{
+                                        alert("删除失败，请重试");
+                                    }
+                               })
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            });
+            //返回首页
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/welcome";
+            })
+        })
+        function load(id,name,department,position,scale) {
+            $.ajaxSettings.async = false;//变为同步请求，以便能找到delete和update按钮
+            $.get("showEmployees",{id:id,name:name,department:department,position:position,scale:scale},function (employees) {
+                var employee_list =
+                    '        <tr>\n' +
+                    '            <th>员工编号</th>\n' +
+                    '            <th>姓名</th>\n' +
+                    '            <th>性别</th>\n' +
+                    '            <th>入职时间</th>\n' +
+                    '            <th>出生日期</th>\n' +
+                    '            <th>年龄</th>\n' +
+                    '            <th>email</th>\n' +
+                    '            <th>电话</th>\n' +
+                    '            <th>所属部门</th>\n' +
+                    '            <th>职位</th>\n' +
+                    '            <th>薪资等级</th>\n' +
+                    '            <th>option-update</th>\n' +
+                    '            <th>option-delete</th>\n' +
+                    '        </tr>';
+                for (var i = 0; i < employees.length; i++){
+                    employee_list += '<tr>\n' +
+                        '            <td>'+employees[i].id+'</td>\n' +
+                        '            <td>'+employees[i].name+'</td>\n' +
+                        '            <td>'+employees[i].sex+'</td>\n' +
+                        '            <td>'+employees[i].entry+'</td>\n' +
+                        '            <td>'+employees[i].birth+'</td>\n' +
+                        '            <td>'+employees[i].age+'</td>\n' +
+                        '            <td>'+employees[i].email+'</td>\n' +
+                        '            <td>'+employees[i].phone+'</td>\n' +
+                        '            <td>'+employees[i].department+'</td>\n' +
+                        '            <td>'+employees[i].position+'</td>\n' +
+                        '            <td>'+employees[i].scale+'</td>\n' +
+                        '            <td>\n' +
+                        '                <a href="employee/update?id='+employees[i].id+'">更改</a>\n' +
+                        '            </td>\n' +
+                        '            <td>\n' +
+                        '                <a class="delete" deleteId="'+employees[i].id+'">删除</a>\n' +
+                        '            </td>\n' +
+                        '        </tr>';
+                }
+                $('#employee_table').html(employee_list);
+            })
+            $.ajaxSettings.async = true;
+        }
+    </script>
+</head>
+<body>
+    <h1 align="center">员工信息页</h1><br>
+    <div th:align="center">
+        <h3>搜索：<input id="employee_search_box" name="employee_search_box" type="text"></h3>
+        <select id="employee_search_type">
+            <option value ="id">员工编号</option>
+            <option value ="name">姓名</option>
+            <option value="department">所属部门</option>
+            <option value="position">职位</option>
+            <option value="scale">薪资等级</option>
+        </select>
+    </div>
+    <br>
+    <div th:align="center">
+        <button id="employee_search_btn" type="button"><h3>查询</h3></button>
+    </div>
+    <div th:align="center">
+        <button id="employee_add_btn" type="button"><h3>添加员工</h3></button>
+    </div>
+    <br>
+    <table border="1" cellpadding="0" cellspacing="0" th:align="center" id="employee_table">
+        <tr>
+            <th>员工编号</th>
+            <th>姓名</th>
+            <th>性别</th>
+            <th>入职时间</th>
+            <th>出生日期</th>
+            <th>年龄</th>
+            <th>email</th>
+            <th>电话</th>
+            <th>所属部门</th>
+            <th>职位</th>
+            <th>薪资等级</th>
+            <th>option1</th>
+            <th>option2</th>
+        </tr>
+    </table>
+    <br>
+    <div th:align="center">
+        <button id="back_btn" type="button"><h3>返回首页</h3></button>
+    </div>
+</body>
+</html>

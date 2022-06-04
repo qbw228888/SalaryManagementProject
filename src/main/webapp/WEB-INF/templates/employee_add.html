@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>employee_add</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script>
+        $(function () {
+            $('#add_btn').click(function () {
+                if (checkName() && checkSex() && checkAge() && checkEmail() && checkPhone()
+                && checkDepartment() && checkPosition() && checkScale()){
+                    $.post("addEmployee",$('#employee_form').serialize(),function (flag) {
+                        if (flag){
+                            alert("添加成功");
+                            location.href = "/SalaryManagementSystem/employee";
+                        } else{
+                            $('#error_message').html("添加失败，请重试");
+                        }
+                    })
+                }
+            })
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/employee";
+            })
+            $('#name').blur(checkName);
+            $('#sex').blur(checkSex);
+            $('#age').blur(checkAge);
+            $('#email').blur(checkEmail);
+            $('#phone').blur(checkPhone);
+            $('#department').blur(checkDepartment);
+            $('#position').blur(checkPosition);
+            $('#scale').blur(checkScale);
+        })
+        function checkName() {
+            if ($('#name').val() == null){
+                $('#name').css("border","1px solid red");
+                return false;
+            } else {
+                $('#name').css("border","");
+                return true;
+            }
+        }
+        function checkSex() {
+            if ($('#sex').val() == null){
+                $('#sex').css("border","1px solid red");
+                return false;
+            } else {
+                $('#sex').css("border","");
+                return true;
+            }
+        }
+        function checkAge() {
+            if ($('#age').val() == null){
+                $('#age').css("border","1px solid red");
+                return false;
+            } else {
+                $('#age').css("border","");
+                return true;
+            }
+        }
+        function checkEmail() {
+            if ($('#email').val() == null){
+                $('#email').css("border","1px solid red");
+                return false;
+            } else {
+                $('#email').css("border","");
+                return true;
+            }
+        }
+        function checkPhone() {
+            if ($('#phone').val() == null){
+                $('#phone').css("border","1px solid red");
+                return false;
+            } else {
+                $('#phone').css("border","");
+                return true;
+            }
+        }
+        function checkDepartment() {
+            if ($('#department').val() == null){
+                $('#department').css("border","1px solid red");
+                return false;
+            } else {
+                $('#department').css("border","");
+                return true;
+            }
+        }
+        function checkPosition() {
+            if ($('#position').val() == null){
+                $('#position').css("border","1px solid red");
+                return false;
+            } else {
+                $('#position').css("border","");
+                return true;
+            }
+        }
+        function checkScale() {
+            if ($('#scale').val() == null){
+                $('#scale').css("border","1px solid red");
+                return false;
+            } else {
+                $('#scale').css("border","");
+                return true;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1 align="center">添加用户</h1><br>
+    <h3 th:align="center" id="error_message"></h3>
+    <form id="employee_form" method="post">
+        <h2 align="center">姓名：<input id="name" name="name" type="text"></h2>
+        <h2 align="center">性别：<input id="sex" name="sex" type="text"></h2>
+        <h2 align="center">入职时间：<input id="entry" name="entry" type="date"></h2>
+        <h2 align="center">出生日期：<input id="birth" name="birth" type="date"></h2>
+        <h2 align="center">年龄：<input id="age" name="age" type="text"></h2>
+        <h2 align="center">e-mail：<input id="email" name="email" type="text"></h2>
+        <h2 align="center">电话：<input id="phone" name="phone" type="text"></h2>
+        <h2 align="center">所属部门：<input id="department" name="department" type="text"></h2>
+        <h2 align="center">职位：<input id="position" name="position" type="text"></h2>
+        <h2 align="center">薪资等级：<input id="scale" name="scale" type="text"></h2>
+        <div th:align="center">
+            <button id="add_btn" type="button"><h2>添加</h2></button>
+            <button id="back_btn" type="button"><h2>返回</h2></button>
+        </div>
+    </form>
+</body>
+</html>

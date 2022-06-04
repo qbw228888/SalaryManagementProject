@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>department_update</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        $(function () {
+            var urlStr = window.location.search;
+            var id = urlStr.split("=",2)[1];
+            $.ajaxSettings.async = false;//变为同步请求
+            $.get("/SalaryManagementSystem/getDepartment",{id:id},function (department) {
+                var department_form =
+                    '        <input id="oldId" name="oldId" type="hidden" value="'+id+'">\n' +
+                    '        <h2 align="center">部门编号：<input id="newId" name="newId" type="text" value="'+department.id+'"></h2>\n' +
+                    '        <h2 align="center">部门名称：<input id="name" name="name" type="text" value="'+department.name+'"></h2>\n' +
+                    '        <h2 align="center">部门人数：<input id="count" name="count" type="text" value="'+department.count+'"></h2>\n' +
+                    '        <div align="center">\n' +
+                    '            <button id="update_btn" type="button"><h2>更改</h2></button>\n' +
+                    '            <button id="back_btn" type="button"><h2>返回</h2></button>\n'   +
+                    '        </div>\n';
+                $('#department_form').html(department_form);
+            })
+            $.ajaxSettings.async = true;
+
+            $('#update_btn').click(function () {
+                $.confirm({
+                    title: '确认',
+                    content: '确认修改该条数据?注意！员工信息表可能也将被修改！',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                $.post("updateDepartment",$('#department_form').serialize(),function (flag) {
+                                    if (flag){
+                                        alert("修改成功");
+                                        location.href = "/SalaryManagementSystem/department";
+                                    } else{
+                                        alert("修改失败，请重试");
+                                    }
+                                })
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            })
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/department";
+            })
+        })
+    </script>
+</head>
+<body>
+<h1 align="center">修改部门</h1><br>
+<form id="department_form" method="post">
+    <h2 align="center">部门编号：<input id="id" type="text"></h2>
+    <h2 align="center">部门名称：<input id="name" type="text"></h2>
+    <h2 align="center">部门人数：<input id="count" type="text"></h2>
+    <div th:align="center">
+        <button id="update_btn" type="button"><h2>更改</h2></button>
+    </div>
+</form>
+</body>
+</html>

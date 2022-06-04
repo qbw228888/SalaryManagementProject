@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>position_update</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        function checkId() {
+            var id = $('#newId').val();
+            var reg_id = /^[0-9]{1,5}$/;
+            var flag = reg_id.test(id);
+            if (!flag){
+                $('#newId').css("border","1px solid red");
+                return false;
+            }else{
+                $('#newId').css("border","");
+                return true;
+            }
+        }
+        function checkName() {
+            var name = $('#name').val();
+            var reg_name = 	/^[\u2E80-\u9FFF]+$/;
+            var flag = reg_name.test(name);
+            if (!flag){
+                $('#name').css("border","1px solid red");
+                return false;
+            }else{
+                $('#name').css("border","");
+                return true;
+            }
+        }
+        function checkDescription() {
+            var description = $('#description').val();
+            var reg_description = 	/^[\u2E80-\u9FFF]+$/;
+            var flag = reg_description.test(description);
+            if (!flag){
+                $('#description').css("border","1px solid red");
+                return false;
+            }else{
+                $('#description').css("border","");
+                return true;
+            }
+        }
+        $(function () {
+            var urlStr = window.location.search;
+            var id = urlStr.split("=",2)[1];
+            $.ajaxSettings.async = false;//变为同步请求
+            $.get("/SalaryManagementSystem/getPosition",{id:id},function (position) {
+                var position_form =
+                    '        <input id="oldId" name="oldId" type="hidden" value="'+id+'">\n' +
+                    '        <h2 align="center">职位标号：<input id="newId" name="newId" type="text" value="'+position.id+'"></h2>\n' +
+                    '        <h2 align="center">职位名称：<input id="name" name="name" type="text" value="'+position.name+'"></h2>\n' +
+                    '        <h2 align="center">职位描述：<input id="description" name="description" type="text" value="'+position.description+'"></h2>\n' +
+                    '        <div align="center">\n' +
+                    '            <button id="update_btn" type="button"><h2>更改</h2></button>\n' +
+                    '            <button id="back_btn" type="button"><h2>返回</h2></button>\n'   +
+                    '        </div>\n';
+                $('#position_form').html(position_form);
+            })
+            $.ajaxSettings.async = true;
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/position";
+            })
+            $('#update_btn').click(function () {
+                $.confirm({
+                    title: '确认',
+                    content: '确认修改该条数据?注意！员工信息表可能也将被修改！',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                if (checkId() && checkName() && checkDescription()) {
+                                    $.post("updatePosition", $('#position_form').serialize(), function (flag) {
+                                        if (flag) {
+                                            alert("修改成功");
+                                            location.href = "/SalaryManagementSystem/position";
+                                        } else {
+                                            alert("修改失败，请重试");
+                                        }
+                                    })
+                                }
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            })
+            $('#newId').blur(checkId);
+            $('#name').blur(checkName);
+            $('#description').blur(checkDescription);
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">修改职位</h1><br>
+    <form id="position_form" method="post">
+        <h2 align="center">职位编号：<input id="id" type="text"></h2>
+        <h2 align="center">职位名称：<input id="name" type="text"></h2>
+        <h2 align="center">职位描述：<input id="count" type="text"></h2>
+        <div th:align="center">
+            <button id="update_btn" type="button"><h2>更改</h2></button>
+        </div>
+    </form>
+</body>
+</html>

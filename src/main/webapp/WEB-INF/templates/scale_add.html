@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>scale_add</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script>
+        function checkId() {
+            var id = $('#id').val();
+            var reg_id = /^[0-9]{1,5}$/;
+            var flag = reg_id.test(id);
+            if (!flag){
+                $('#id').css("border","1px solid red");
+                return false;
+            }else{
+                $('#id').css("border","");
+                return true;
+            }
+        }
+        function checkSalary() {
+            var salary = $('#salary').val();
+            var reg_salary = /^[0-9]{1,10}$/;
+            var flag = reg_salary.test(salary);
+            if (!flag){
+                $('#salary').css("border","1px solid red");
+                return false;
+            }else{
+                $('#salary').css("border","");
+                return true;
+            }
+        }
+        function checkDescription() {
+            var description = $('#description').val();
+            var reg_description = 	/^[\u2E80-\u9FFF]+$/;
+            var flag = reg_description.test(description);
+            if (!flag){
+                $('#description').css("border","1px solid red");
+                return false;
+            }else{
+                $('#description').css("border","");
+                return true;
+            }
+        }
+        $(function () {
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/scale";
+            })
+            $('#add_btn').click(function () {
+                if (checkSalary() && checkId() && checkDescription()) {
+                    $.post("addScale", $('#scale_form').serialize(),function (flag) {
+                        if (flag){
+                            alert("添加成功");
+                            location.href = "/SalaryManagementSystem/scale";
+                        } else{
+                            alert("添加失败，请重试！");
+                        }
+                    })
+                }
+            })
+            $('#id').blur(checkId);
+            $('#salary').blur(checkSalary);
+            $('#description').blur(checkDescription);
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">添加工资等级</h1><br>
+    <form id="scale_form" method="post">
+        <h2 align="center">等级编号：<input id="id" name="id" type="text"></h2>
+        <h2 align="center">基本工资：<input id="salary" name="salary" type="text"></h2>
+        <h2 align="center">等级描述：<input id="description" name="description" type="text"></h2>
+        <div th:align="center">
+            <button id="add_btn" type="button"><h2>添加</h2></button>
+            <button id="back_btn" type="button"><h2>返回</h2></button>
+        </div>
+    </form>
+</body>
+</html>

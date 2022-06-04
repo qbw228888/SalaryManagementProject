@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="mybatis-config.xml"></properties>
+    <settings>
+<!--        下划线命名自动转换为驼峰法-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+<!--    别名处理器，可以不用在sql映射文件中总是写全类名
+        别名不区分大小写，不写alias标签，别名默认为类名-->
+    <typeAliases>
+<!--        <typeAlias type="com.Mybatis.bean.Vip" alias="Vip"/>-->
+<!--        可以用package标签对一个包下的类批量起别名,默认每个类的别名是它的类名
+            这种情况下可以在类中用@Alias标签指定一个别名-->
+        <package name="com.SalaryManagement.Domain"/>
+    </typeAliases>
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="config\mybatisMapper\VipMapper.xml"/>
+<!--        可以直接在接口上用注解添加sql语句，就不需要映射文件，此时用class注册接口类即可
+            不过接口维护非常困难，还是应该使用映射文件-->
+<!--        <mapper class="com.Mybatis.dao.VipMapper"/>-->
+    </mappers>
+</configuration>

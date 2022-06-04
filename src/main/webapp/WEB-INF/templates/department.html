@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SalaryManagementSystem-department</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        function load() {
+            $.ajaxSettings.async = false;
+            $.get("showDepartments",{},function (departments) {
+                var department_list = '<tr>\n' +
+                    '            <th>部门编号</th>\n' +
+                    '            <th>部门名称</th>\n' +
+                    '            <th>部门人数</th>\n' +
+                    '            <th>option-update</th>\n' +
+                    '            <th>option-delete</th>\n' +
+                    '        </tr>';
+                for (var i = 0; i < departments.length; i++){
+                    department_list += '<tr>\n' +
+                        '            <td>'+departments[i].id+'</td>\n' +
+                        '            <td>'+departments[i].name+'</td>\n' +
+                        '            <td>'+departments[i].count+'</td>\n' +
+                        '            <td>\n' +
+                        '                <a href="department/update?id='+departments[i].id+'">更改</a>\n' +
+                        '            </td>\n' +
+                        '            <td>\n' +
+                        '                <a class="delete" deleteId="'+departments[i].id+'">删除</a>\n' +
+                        '            </td>\n' +
+                        '        </tr>';
+                }
+                $('#department_table').html(department_list);
+            })
+            $.ajaxSettings.async = true;
+        }
+        $(function () {
+            load();
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/welcome";
+            })
+            $('#department_add_btn').click(function () {
+                location.href = "/SalaryManagementSystem/department/add";
+            })
+
+            $('.delete').click(function () {
+                var id = $(this).attr("deleteId");
+                $.confirm({
+                    title: '确认',
+                    content: '确认删除该条数据?注意！隶属该部门的员工部门信息也将被修改为null！',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                $.post("department/delete",{id:id},function (flag) {
+                                    if (flag){
+                                        alert("删除成功");
+                                        load();
+                                    } else{
+                                        alert("删除失败，请重试");
+                                    }
+                                })
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            })
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">部门信息页</h1><br>
+    <div th:align="center">
+        <button id="department_add_btn" type="button"><h3>添加部门信息</h3></button>
+    </div>
+    <br>
+    <table border="1" cellpadding="0" cellspacing="0" th:align="center" id="department_table">
+        <tr>
+            <th>部门编号</th>
+            <th>部门名称</th>
+            <th>option-update</th>
+            <th>option-delete</th>
+        </tr>
+    </table>
+    <br>
+    <div th:align="center">
+        <button id="back_btn" type="button"><h3>返回首页</h3></button>
+    </div>
+</body>
+</html>

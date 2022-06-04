@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>employee_updadte</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        $(function () {
+            var urlStr = window.location.search;
+            var id = urlStr.split("=",2)[1];
+            $.ajaxSettings.async = false;//变为同步请求
+            $.get("/SalaryManagementSystem/showEmployees",{id:id},function (employees) {
+                var employee_form =
+                    '        <input id="id" name="id" type="hidden" value="'+id+'">\n' +
+                    '        <h2 align="center">姓名：<input id="name" name="name" type="text" value="'+employees[0].name+'"></h2>\n' +
+                    '        <h2 align="center">性别：<input id="sex" name="sex" type="text" value="'+employees[0].sex+'"></h2>\n' +
+                    '        <h2 align="center">入职时间：<input id="entry" name="entry" type="date" value="'+employees[0].entry+'"></h2>\n' +
+                    '        <h2 align="center">出生日期：<input id="birth" name="birth" type="date" value="'+employees[0].birth+'"></h2>\n' +
+                    '        <h2 align="center">年龄：<input id="age" name="age" type="text" value="'+employees[0].age+'"></h2>\n' +
+                    '        <h2 align="center">e-mail：<input id="email" name="email" type="text" value="'+employees[0].email+'"></h2>\n' +
+                    '        <h2 align="center">电话：<input id="phone" name="phone" type="text" value="'+employees[0].phone+'"></h2>\n' +
+                    '        <h2 align="center">所属部门：<input id="department" name="department" type="text" value="'+employees[0].department+'"></h2>\n' +
+                    '        <h2 align="center">职位：<input id="position" name="position" type="text" value="'+employees[0].position+'"></h2>\n' +
+                    '        <h2 align="center">薪资等级：<input id="scale" name="scale" type="text" value="'+employees[0].scale+'"></h2>\n' +
+                    '        <div align="center">\n' +
+                    '            <button id="update_btn" type="button"><h2>更改</h2></button>\n' +
+                    '            <button id="back_btn" type="button"><h2>返回</h2></button>\n'   +
+                    '        </div>\n';
+                $('#employee_form').html(employee_form);
+            })
+            $.ajaxSettings.async = true;
+
+            $('#update_btn').click(function () {
+                $.confirm({
+                    title: '确认',
+                    content: '确认修改该条数据?',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                $.post("updateEmployee",$('#employee_form').serialize(),function (flag) {
+                                    if (flag){
+                                        alert("修改成功");
+                                        location.href = "/SalaryManagementSystem/employee";
+                                    } else{
+                                        alert("修改失败，请重试");
+                                    }
+                                })
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            })
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/employee";
+            })
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">修改用户</h1><br>
+    <form id="employee_form" method="post">
+        <h2 align="center">姓名：<input id="name" name="name" type="text"></h2>
+        <h2 align="center">性别：<input id="sex" name="sex" type="text"></h2>
+        <h2 align="center">入职时间：<input id="entry" name="entry" type="date"></h2>
+        <h2 align="center">出生日期：<input id="birth" name="birth" type="date"></h2>
+        <h2 align="center">年龄：<input id="age" name="age" type="text"></h2>
+        <h2 align="center">e-mail：<input id="email" name="email" type="text"></h2>
+        <h2 align="center">电话：<input id="phone" name="phone" type="text"></h2>
+        <h2 align="center">所属部门：<input id="department" name="department" type="text"></h2>
+        <h2 align="center">职位：<input id="position" name="position" type="text"></h2>
+        <h2 align="center">薪资等级：<input id="scale" name="scale" type="text"></h2>
+        <div th:align="center">
+            <button id="update_btn" type="button"><h2>更改</h2></button>
+        </div>
+    </form>
+</body>
+</html>

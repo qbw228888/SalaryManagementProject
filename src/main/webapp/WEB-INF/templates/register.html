@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SalaryManagementSystem-register</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script>
+        function checkUsername() {
+            var username = $('#username').val();
+            //定义正则
+            var reg_username = /^\w{3,12}$/;
+            var flag = reg_username.test(username);
+            if (flag){
+                $('#username').css("border","");
+            }else{
+                //如果输入格式有误，则将边框标红
+                $('#username').css("border","1px solid red");
+            }
+            return flag;
+        }
+        function checkPassword() {
+            var password = $('#password').val();
+            //定义正则
+            var reg_password = /^\w{5,20}$/;
+            var flag = reg_password.test(password);
+            if (flag){
+                $('#password').css("border","");
+            }else{
+                //如果输入格式有误，则将边框标红
+                $('#password').css("border","1px solid red");
+            }
+            return flag;
+        }
+        $(function () {
+            $('#register_btn').click(function () {
+                if (checkPassword() && checkUsername()){
+                    $.post("register/application",$('#register_form').serialize(),function (flag) {
+                        if (flag){
+                            alert("注册成功，请登录");
+                            location.href = "/SalaryManagementSystem/login";
+                        } else{
+                            $('#error_message').html("注册失败，请重试");
+                        }
+                    })
+                }
+            })
+            $('#username').blur(checkUsername);
+            $('#password').blur(checkPassword);
+        })
+
+    </script>
+</head>
+<body>
+    <h1 align="center">注册</h1><br><br>
+    <h3 th:align="center" id="error_message"></h3>
+    <form id="register_form" method="post">
+        <h2 align="center">用户名：<input id="username" name="username" type="text"></h2><br>
+        <h2 align="center">密码：<input id="password" name="password" type="password"></h2><br>
+        <div th:align="center">
+            <button id="register_btn" type="button"><h2>注册</h2></button>
+        </div>
+    </form>
+</body>
+</html>

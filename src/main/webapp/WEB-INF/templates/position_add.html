@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>position_add</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script>
+        function checkId() {
+            var id = $('#id').val();
+            var reg_id = /^[0-9]{1,5}$/;
+            var flag = reg_id.test(id);
+            if (!flag){
+                $('#id').css("border","1px solid red");
+                return false;
+            }else{
+                $('#id').css("border","");
+                return true;
+            }
+        }
+        function checkName() {
+            var name = $('#name').val();
+            var reg_name = 	/^[\u2E80-\u9FFF]+$/;
+            var flag = reg_name.test(name);
+            if (!flag){
+                $('#name').css("border","1px solid red");
+                return false;
+            }else{
+                $('#name').css("border","");
+                return true;
+            }
+        }
+        function checkDescription() {
+            var description = $('#description').val();
+            var reg_description = 	/^[\u2E80-\u9FFF]+$/;
+            var flag = reg_description.test(description);
+            if (!flag){
+                $('#description').css("border","1px solid red");
+                return false;
+            }else{
+                $('#description').css("border","");
+                return true;
+            }
+        }
+        $(function () {
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/position";
+            })
+            $('#add_btn').click(function () {
+                if (checkName() && checkId() && checkDescription()) {
+                    $.post("addPosition", $('#position_form').serialize(),function (flag) {
+                        if (flag){
+                            alert("添加成功");
+                            location.href = "/SalaryManagementSystem/position";
+                        } else{
+                            alert("添加失败，请重试！");
+                        }
+                    })
+                }
+            })
+            $('#id').blur(checkId);
+            $('#name').blur(checkName);
+            $('#description').blur(checkDescription);
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">添加职位</h1><br>
+    <form id="position_form" method="post">
+        <h2 align="center">职位编号：<input id="id" name="id" type="text"></h2>
+        <h2 align="center">职位名称：<input id="name" name="name" type="text"></h2>
+        <h2 align="center">职位描述：<input id="description" name="description" type="text"></h2>
+        <div th:align="center">
+            <button id="add_btn" type="button"><h2>添加</h2></button>
+            <button id="back_btn" type="button"><h2>返回</h2></button>
+        </div>
+    </form>
+</body>
+</html>

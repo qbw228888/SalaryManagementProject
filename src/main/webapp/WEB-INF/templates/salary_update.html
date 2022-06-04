@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>salary_update</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        function checkAllowance() {
+            var allowance = $('#allowance').val();
+            var reg_allowance = /^[0-9]{1,9}$/;
+            var flag = reg_allowance.test(allowance);
+            if (!flag){
+                $('#allowance').css("border","1px solid red");
+                return false;
+            }else{
+                $('#allowance').css("border","");
+                return true;
+            }
+        }
+        function checkDeduction() {
+            var deduction = $('#deduction').val();
+            var reg_deduction = /^[0-9]{1,9}$/;
+            var flag = reg_deduction.test(deduction);
+            if (!flag){
+                $('#deduction').css("border","1px solid red");
+                return false;
+            }else{
+                $('#deduction').css("border","");
+                return true;
+            }
+        }
+        $(function () {
+            var urlStr = window.location.search;
+            var eidStr = urlStr.split("=",3)[1];
+            var eid = eidStr.split("&",2)[0];
+            var salaryTime = urlStr.split("=",3)[2];
+            $.ajaxSettings.async = false;//变为同步请求
+            $.get("getBaseSalary",{eid:eid},function (baseSalary) {
+                $('#id').val(eid);
+                $('#id').attr("readonly","readonly");
+                $('#salaryTime').val(salaryTime);
+                $('#salaryTime').attr("readonly","readonly");
+                $('#baseSalary').val(baseSalary);
+                $('#baseSalary').attr("readonly","readonly");
+            })
+            $.ajaxSettings.async = true;
+            $('#deduction').blur(function () {
+                var baseSalary = parseFloat($('#baseSalary').val());
+                var allowance = parseFloat($('#allowance').val());
+                var deduction = parseFloat($('#deduction').val());
+                if (checkAllowance() && checkDeduction()){
+                    var realSalary = baseSalary+allowance-deduction;
+                    $('#realSalaryShow').html(realSalary);
+                    $('#realSalary').val(realSalary);
+                }
+            })
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/salary";
+            })
+            $('#allowance').blur(checkAllowance);
+            $('#update_btn').click(function () {
+                $.confirm({
+                    title: '确认',
+                    content: '确认修改该条数据?',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                $.post("updateSalary",$('#salary_form').serialize(),function (flag) {
+                                    if (flag){
+                                        alert("修改成功");
+                                        location.href = "/SalaryManagementSystem/salary";
+                                    } else{
+                                        alert("修改失败，请重试");
+                                    }
+                                })
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            })
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">修改工资信息</h1><br>
+    <div th:align="center" id="form">
+        <form id="salary_form" method="post">
+            <h2 align="center">员工编号：<input id="id" name="id" type="text"></h2>
+            <h2 align="center">工资发放时间：<input id="salaryTime" name="salaryTime" type="month"></h2>
+            <h2 align="center">基础工资：<input id="baseSalary" name="baseSalary" type="text"></h2>
+            <h2 align="center">奖金：<input id="allowance" name="allowance" type="text"></h2>
+            <h2 align="center">扣费：<input id="deduction" name="deduction" type="text"></h2>
+            <h2 align="center"><input id="realSalary" name="realSalary" type="hidden"></h2>
+            <div><h2>实发工资:<div id="realSalaryShow"></div></h2></div>
+            <div th:align="center">
+                <button id="update_btn" type="button"><h2>修改</h2></button>
+                <button id="back_btn" type="button"><h2>返回</h2></button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

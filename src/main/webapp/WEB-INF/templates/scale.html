@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SalaryManagementSystem-scale</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js "></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+        function load() {
+            $.ajaxSettings.async = false;
+            $.get("showScales",{},function (scales) {
+                var scale_list = '<tr>\n' +
+                    '            <th>等级编号</th>\n' +
+                    '            <th>基本工资</th>\n' +
+                    '            <th>等级描述</th>\n' +
+                    '            <th>option-update</th>\n' +
+                    '            <th>option-delete</th>\n' +
+                    '        </tr>';
+                for (var i = 0; i < scales.length; i++){
+                    scale_list += '<tr>\n' +
+                        '            <td>'+scales[i].id+'</td>\n' +
+                        '            <td>'+scales[i].salary+'</td>\n' +
+                        '            <td>'+scales[i].description+'</td>\n' +
+                        '            <td>\n' +
+                        '                <a href="scale/update?id='+scales[i].id+'">更改</a>\n' +
+                        '            </td>\n' +
+                        '            <td>\n' +
+                        '                <a class="delete" deleteId="'+scales[i].id+'">删除</a>\n' +
+                        '            </td>\n' +
+                        '        </tr>';
+                }
+                $('#scale_table').html(scale_list);
+            })
+            $.ajaxSettings.async = true;
+        }
+        $(function () {
+            load();
+
+            $('#back_btn').click(function () {
+                location.href = "/SalaryManagementSystem/welcome";
+            })
+
+            $('.delete').click(function () {
+                var id = $(this).attr("deleteId");
+                $.confirm({
+                    title: '确认',
+                    content: '确认删除该条数据?注意！该职位的员工的工资等级也将被修改为0！',
+                    type: 'blue',
+                    buttons: {
+                        ok: {
+                            text: '确认',
+                            btnClass: 'btn-primary',
+                            action: function () {
+                                $.post("scale/delete",{id:id},function (flag) {
+                                    if (flag){
+                                        alert("删除成功");
+                                        load();
+                                    } else{
+                                        alert("删除失败，请重试");
+                                    }
+                                })
+                            }
+                        },
+                        cancel: {
+                            text: '取消',
+                            btnClass: 'btn-primary'
+                        }
+                    }
+                });
+            })
+
+            $('#scale_add_btn').click(function () {
+                location.href = "/SalaryManagementSystem/scale/add";
+            })
+        })
+    </script>
+</head>
+<body>
+    <h1 align="center">工资等级信息页</h1><br>
+    <div th:align="center">
+        <button id="scale_add_btn" type="button"><h3>添加工资等级</h3></button>
+    </div>
+    <br>
+    <table border="1" cellpadding="0" cellspacing="0" th:align="center" id="scale_table">
+    </table>
+    <br>
+    <div th:align="center">
+        <button id="back_btn" type="button"><h3>返回首页</h3></button>
+    </div>
+</body>
+</html>
